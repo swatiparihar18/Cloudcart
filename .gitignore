@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+
+# build
+build/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# docker
+*.log
+
+# vscode
+.vscode/
+
+# coverage
+coverage/
