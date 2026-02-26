@@ -3,10 +3,10 @@ import axios from "axios";
 import "./App.css";
 
 const products = [
-  { name: "Fresh Apples", price: "₹120/kg" },
-  { name: "Organic Milk", price: "₹60/litre" },
-  { name: "Tomatoes", price: "₹40/kg" },
-  { name: "Potatoes", price: "₹30/kg" },
+  { id: 1, name: "Fresh Apples", price: 120, unit: "kg", image: "https://via.placeholder.com/150?text=Apples" },
+  { id: 2, name: "Organic Milk", price: 60, unit: "litre", image: "https://via.placeholder.com/150?text=Milk" },
+  { id: 3, name: "Tomatoes", price: 40, unit: "kg", image: "https://via.placeholder.com/150?text=Tomatoes" },
+  { id: 4, name: "Potatoes", price: 30, unit: "kg", image: "https://via.placeholder.com/150?text=Potatoes" },
 ];
 
 function App() {
@@ -16,90 +16,95 @@ function App() {
   const [mobile, setMobile] = useState("");
   const [message, setMessage] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [cart, setCart] = useState([]);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+    alert(`${product.name} added to cart!`);
+  };
 
   const register = async () => {
     try {
-      const res = await axios.post(`${API_URL}/register`, {
-        email,
-        password,
-        mobile,
-      });
+      const res = await axios.post(`${API_URL}/register`, { email, password, mobile });
       setMessage(res.data.message);
     } catch (err) {
-      console.error(err);
-      setMessage("Registration failed. Check backend or network.");
+      setMessage("Registration failed. Check connection.");
     }
   };
 
   const login = async () => {
     try {
-      const res = await axios.post(`${API_URL}/login`, {
-        email,
-        password,
-      });
+      const res = await axios.post(`${API_URL}/login`, { email, password });
       setMessage(res.data.message);
       setLoggedIn(true);
     } catch (err) {
-      console.error(err);
-      setMessage("Login failed. Check credentials or backend.");
+      setMessage("Login failed. Check credentials.");
     }
   };
 
   if (loggedIn) {
     return (
-      <div className="container">
-        <h2>FreshMart Grocery</h2>
-        <div className="products">
-          {products.map((p, i) => (
-            <div key={i} className="card">
-              <h3>{p.name}</h3>
-              <p>{p.price}</p>
-              <button>Add to Cart</button>
-            </div>
-          ))}
+      <div className="dashboard">
+        <nav className="navbar">
+          <h1>CloudCart</h1>
+          <div className="nav-info">
+            <span>Items in Cart: {cart.length}</span>
+            <button className="logout-btn" onClick={() => setLoggedIn(false)}>Logout</button>
+          </div>
+        </nav>
+        <div className="main-content">
+          <h2>Fresh Grocery Collection</h2>
+          <div className="product-grid">
+            {products.map((p) => (
+              <div key={p.id} className="product-card">
+                <img src={p.image} alt={p.name} />
+                <h3>{p.name}</h3>
+                <p className="price">₹{p.price} / {p.unit}</p>
+                <button className="add-btn" onClick={() => addToCart(p)}>Add to Cart</button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container">
-      <div className="formCard">
-        <h2>{isLogin ? "Login" : "Register"}</h2>
-
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
+        
         {!isLogin && (
-          <input
-            placeholder="Mobile Number"
-            onChange={(e) => setMobile(e.target.value)}
+          <input 
+            type="text" 
+            placeholder="Mobile Number" 
+            onChange={(e) => setMobile(e.target.value)} 
           />
         )}
-
-        <input
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
+        
+        <input 
+          type="email" 
+          placeholder="Email Address" 
+          onChange={(e) => setEmail(e.target.value)} 
+        />
+        
+        <input 
+          type="password" 
+          placeholder="Password" 
+          onChange={(e) => setPassword(e.target.value)} 
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <button className="submit-btn" onClick={isLogin ? login : register}>
+          {isLogin ? "Login" : "Register"}
+        </button>
 
-        {isLogin ? (
-          <button onClick={login}>Login</button>
-        ) : (
-          <button onClick={register}>Register</button>
-        )}
-
-        <p className="toggle" onClick={() => setIsLogin(!isLogin)}>
-          {isLogin
-            ? "New user? Register here"
-            : "Already have account? Login"}
+        <p className="toggle-text" onClick={() => setIsLogin(!isLogin)}>
+          {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
         </p>
-
-        <p>{message}</p>
+        
+        {message && <p className="status-msg">{message}</p>}
       </div>
     </div>
   );
