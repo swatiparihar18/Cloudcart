@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://mongo:27017/cloudcart", {
+mongoose.connect("mongodb+srv://swatiparihar:Swatip.123@cluster0.czdx4ed.mongodb.net/?appName=Cluster0/cloudcart", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
